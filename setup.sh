@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Mukh IDE - The Royal Installer (v5.1 - Command Fix)
+# Mukh IDE - The Reliable Installer (v6.0 - Absolute Path Fix)
 
-echo "🚀 Welcome to the Mukh IDE Royal Installer!"
+echo "🚀 Welcome to the Mukh IDE Reliable Installer!"
 echo "--- Preparing your environment..."
 pkg update -y && pkg upgrade -y > /dev/null 2>&1
 packages_to_install=("git" "python" "curl" "tar")
@@ -19,10 +19,11 @@ echo "--- Unpacking and setting up tools..."
 tar -xzvf mukh-ide-tools.tar.gz -C ~
 rm mukh-ide-tools.tar.gz
 
-# THIS IS THE CRUCIAL FIX: Create the symbolic links
+# THE RELIABLE FIX: Create symbolic links using the absolute path
 echo "--- Creating global commands..."
-ln -sf ~/mukh-ide-tools/mukh-bot ~/../usr/bin/mukh-bot
-ln -sf ~/mukh-ide-tools/manus-core ~/../usr/bin/manus-core
+TERMUX_BIN_DIR="/data/data/com.termux/files/usr/bin"
+ln -sf ~/mukh-ide-tools/mukh-bot "$TERMUX_BIN_DIR/mukh-bot"
+ln -sf ~/mukh-ide-tools/manus-core "$TERMUX_BIN_DIR/manus-core"
 
 echo ""
 echo "--- ⚙️ Configuring your personal settings..."
@@ -35,7 +36,7 @@ if ! python -c "import telegram" &> /dev/null; then
 fi
 
 echo ""
-echo "🎉🎉🎉 ROYAL SETUP COMPLETE! 🎉🎉🎉"
+echo "🎉🎉🎉 RELIABLE SETUP COMPLETE! 🎉🎉🎉"
 echo "Your entire system is ready."
 echo ""
 echo "To start your bot from ANYWHERE, just type:"
