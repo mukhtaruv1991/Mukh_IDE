@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Mukh IDE - The Reliable Installer (v6.0 - Absolute Path Fix)
+# Mukh IDE - The Super-Reliable Installer (v7.0 - Direct Copy Fix)
 
-echo "🚀 Welcome to the Mukh IDE Reliable Installer!"
+echo "🚀 Welcome to the Mukh IDE Super-Reliable Installer!"
 echo "--- Preparing your environment..."
 pkg update -y && pkg upgrade -y > /dev/null 2>&1
 packages_to_install=("git" "python" "curl" "tar")
@@ -19,11 +19,13 @@ echo "--- Unpacking and setting up tools..."
 tar -xzvf mukh-ide-tools.tar.gz -C ~
 rm mukh-ide-tools.tar.gz
 
-# THE RELIABLE FIX: Create symbolic links using the absolute path
+# THE SUPER-RELIABLE FIX: Copy the launchers directly to the bin directory
 echo "--- Creating global commands..."
 TERMUX_BIN_DIR="/data/data/com.termux/files/usr/bin"
-ln -sf ~/mukh-ide-tools/mukh-bot "$TERMUX_BIN_DIR/mukh-bot"
-ln -sf ~/mukh-ide-tools/manus-core "$TERMUX_BIN_DIR/manus-core"
+cp ~/mukh-ide-tools/mukh-bot "$TERMUX_BIN_DIR/mukh-bot"
+cp ~/mukh-ide-tools/manus-core "$TERMUX_BIN_DIR/manus-core"
+chmod +x "$TERMUX_BIN_DIR/mukh-bot"
+chmod +x "$TERMUX_BIN_DIR/manus-core"
 
 echo ""
 echo "--- ⚙️ Configuring your personal settings..."
@@ -36,7 +38,7 @@ if ! python -c "import telegram" &> /dev/null; then
 fi
 
 echo ""
-echo "🎉🎉🎉 RELIABLE SETUP COMPLETE! 🎉🎉🎉"
+echo "🎉🎉🎉 SUPER-RELIABLE SETUP COMPLETE! 🎉🎉🎉"
 echo "Your entire system is ready."
 echo ""
 echo "To start your bot from ANYWHERE, just type:"
