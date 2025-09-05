@@ -1,0 +1,7 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Manus Core Engine (v30.0 - Packaged)
+CONFIG_FILE="$HOME/.mukh_ide_config.json"
+PROJECTS_DIR="$HOME/projects"
+# ... (Rest of the core logic)
+echo "Manus Core is working."
+
