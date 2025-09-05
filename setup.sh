@@ -1,34 +1,34 @@
-cat > setup.sh << 'EOL'
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Manus Pro Universal Setup Script (v4.0 - Final)
+# Mukh IDE Universal Setup Script (v4.1 - Patched)
+# This version fixes function scope issues for robust execution.
 # ==============================================================================
 
-# --- UI Colors ---
-C_BLUE="\e[34m"; C_GREEN="\e[32m"; C_YELLOW="\e[33m"; C_RED="\e[31m"; C_RESET="\e[0m"
+# The entire logic is wrapped in a single main function to ensure scope.
+main() {
+    # --- UI Colors & Helper Functions (NOW INSIDE MAIN) ---
+    C_BLUE="\e[34m"; C_GREEN="\e[32m"; C_YELLOW="\e[33m"; C_RED="\e[31m"; C_RESET="\e[0m"
+    print_step() { echo -e "\n${C_BLUE}==> $1${C_RESET}"; }
+    print_success() { echo -e "${C_GREEN}✅ $1${C_RESET}"; }
+    print_warning() { echo -e "${C_YELLOW}⚠️ $1${C_RESET}"; }
+    print_error() { echo -e "${C_RED}❌ $1${C_RESET}"; }
+    prompt_input() {
+        local prompt_text="$1"; local var_name="$2"; local default_value="$3"
+        local value
+        if [ -n "$default_value" ]; then
+            read -p "$prompt_text [Press Enter to use: $default_value]: " value
+            value=${value:-$default_value}
+        else
+            while true; do read -p "$prompt_text: " value; if [ -n "$value" ]; then break; else print_warning "This field cannot be empty."; fi; done
+        fi
+        eval "$var_name='$value'"
+    }
 
-# --- Helper Functions ---
-print_step() { echo -e "\n${C_BLUE}==> $1${C_RESET}"; }
-print_success() { echo -e "${C_GREEN}✅ $1${C_RESET}"; }
-print_warning() { echo -e "${C_YELLOW}⚠️ $1${C_RESET}"; }
-print_error() { echo -e "${C_RED}❌ $1${C_RESET}"; }
-prompt_input() {
-    local prompt_text="$1"; local var_name="$2"; local default_value="$3"
-    local value
-    if [ -n "$default_value" ]; then
-        read -p "$prompt_text [Press Enter to use: $default_value]: " value
-        value=${value:-$default_value}
-    else
-        while true; do read -p "$prompt_text: " value; if [ -n "$value" ]; then break; else print_warning "This field cannot be empty."; fi; done
-    fi
-    eval "$var_name='$value'"
-}
-
-# --- Component Generators ---
-generate_manus_core() {
-    local core_file_path="$1"
-    cat > "$core_file_path" << 'EOC'
+    # --- Component Generators (NOW INSIDE MAIN) ---
+    generate_manus_core() {
+        local core_file_path="$1"
+        cat > "$core_file_path" << 'EOC'
 #!/data/data/com.termux/files/usr/bin/bash
 # ==================================================
 # Manus Core Engine (v20.0)
@@ -123,12 +123,12 @@ main() {
     esac
 }; main "$@"
 EOC
-    chmod +x "$core_file_path"
-}
+        chmod +x "$core_file_path"
+    }
 
-generate_manus_bot() {
-    local bot_file_path="$1"
-    cat > "$bot_file_path" << 'EOB'
+    generate_manus_bot() {
+        local bot_file_path="$1"
+        cat > "$bot_file_path" << 'EOB'
 # ==================================================
 # Manus Bot Interface (v20.0)
 # ==================================================
@@ -201,7 +201,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'main_menu':
         reply_markup, text = get_main_menu()
         await query.edit_message_text(text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
-    
+        
     elif command == 'list_projects':
         projects_raw = run_core_command("list projects")
         projects = sorted([p for p in projects_raw.split('\n') if p])
@@ -256,7 +256,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"✅ تم استيراد المشروع بنجاح باسم: `{project_name}`.\n\nالآن، أرسل رابط مستودع GitHub لربطه (مثال: `https://github.com/user/repo.git`).", parse_mode=ParseMode.MARKDOWN)
             context.user_data['state'] = 'awaiting_repo_url'
             context.user_data['import_project_name'] = project_name
-    
+        
     elif state == 'awaiting_repo_url':
         project_name = context.user_data.get('import_project_name')
         await update.message.reply_text(f"⏳ جاري ربط المشروع `{project_name}` بالمستودع...", parse_mode=ParseMode.MARKDOWN)
@@ -266,7 +266,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup, text = get_project_dashboard_menu(project_name)
         await update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
-def main():
+def bot_main():
     if not TOKEN:
         print("FATAL: Bot token not found in config. Exiting.")
         return
@@ -278,19 +278,17 @@ def main():
     app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    bot_main()
 EOB
-}
+    }
 
-# --- Main Setup Script ---
-main() {
+    # --- Main Setup Logic (NOW INSIDE MAIN) ---
     clear
     echo -e "${C_BLUE}####################################################${C_RESET}"
     echo -e "${C_BLUE}#         Welcome to the Mukh IDE Setup          #${C_RESET}"
     echo -e "${C_BLUE}# This will build your personal development suite.   #${C_RESET}"
     echo -e "${C_BLUE}####################################################${C_RESET}"
 
-    # --- 1. Smart Dependency Check ---
     print_step "Checking and installing required packages..."
     pkg update -y && pkg upgrade -y > /dev/null 2>&1
     packages_to_install=("git" "python" "rsync" "zip" "gh")
@@ -313,7 +311,6 @@ main() {
     done
     print_success "All dependencies are satisfied."
 
-    # --- 2. Intelligent Configuration Gathering ---
     print_step "Gathering your personal keys and tokens..."
     CONFIG_FILE="$HOME/.manus_pro_config.json"
     OLD_TELEGRAM_TOKEN=""; OLD_TELEGRAM_CHAT_ID=""; OLD_GEMINI_API_KEY=""
@@ -327,7 +324,6 @@ main() {
     prompt_input "Enter your Telegram Chat ID" TELEGRAM_CHAT_ID "$OLD_TELEGRAM_CHAT_ID"
     prompt_input "Enter your Gemini API Key" GEMINI_API_KEY "$OLD_GEMINI_API_KEY"
 
-    # --- 3. Smart GitHub Authentication & User Info ---
     print_step "Configuring GitHub access..."
     OLD_GITHUB_USERNAME=""; OLD_GITHUB_EMAIL=""
     if gh auth status &> /dev/null; then
@@ -342,7 +338,6 @@ main() {
     prompt_input "Enter your GitHub Username" GITHUB_USERNAME "$OLD_GITHUB_USERNAME"
     prompt_input "Enter your GitHub Email" GITHUB_EMAIL "$OLD_GITHUB_EMAIL"
 
-    # --- 4. Generate Mukh IDE Components ---
     print_step "Generating your personal Mukh IDE tools..."
     TOOLS_DIR="$HOME/mukh-ide-tools"
     BIN_DIR="$HOME/bin"
@@ -352,7 +347,7 @@ main() {
 
     generate_manus_core "$TOOLS_DIR/manus-core"
     print_success "Generated 'manus-core' engine."
-    
+        
     generate_manus_bot "$TOOLS_DIR/manus_bot.py"
     print_success "Generated 'manus_bot.py' interface."
 
@@ -362,14 +357,13 @@ This repository contains my personal, auto-generated instance of the Mukh IDE su
 EOR
     print_success "Generated 'README.md'."
 
-    # --- 5. Create/Sync User's Personal GitHub Repository ---
     print_step "Setting up your private 'my-mukh-ide-tools' repository on GitHub..."
     cd "$TOOLS_DIR"
     REPO_NAME="my-mukh-ide-tools"
     git init
     git config --global user.name "$GITHUB_USERNAME"
     git config --global user.email "$GITHUB_EMAIL"
-    
+        
     if gh repo view "$GITHUB_USERNAME/$REPO_NAME" &> /dev/null; then
         print_warning "Repository '$REPO_NAME' already exists. Syncing..."
         git remote add origin "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
@@ -378,13 +372,12 @@ EOR
         print_step "Creating new private repository '$REPO_NAME'..."
         gh repo create "$REPO_NAME" --private --source=. --remote=origin
     fi
-    
+        
     git add .
-    git commit -m "Deploy/Update Mukh IDE Tools (v4.0)"
+    git commit -m "Deploy/Update Mukh IDE Tools (v4.1)"
     git push -u origin main -f
     print_success "Pushed your personal tools to your private repository."
 
-    # --- 6. Create/Update Global Config File ---
     print_step "Saving your final configuration securely..."
     cat > "$CONFIG_FILE" << EOL
 {
@@ -398,7 +391,6 @@ EOR
 EOL
     print_success "Global configuration saved to $CONFIG_FILE."
 
-    # --- Finalization ---
     echo -e "\n${C_GREEN}#############################################${C_RESET}"
     echo -e "${C_GREEN}#   Setup Complete! Welcome to Mukh IDE.    #${C_RESET}"
     echo -e "${C_GREEN}#############################################${C_RESET}"
@@ -409,4 +401,3 @@ EOL
 
 # --- Run the main setup function ---
 main
-EOL
