@@ -1,0 +1,42 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Manus Core Engine (v30.0 - Full Version)
+CONFIG_FILE="$HOME/.mukh_ide_config.json"
+PROJECTS_DIR="$HOME/projects"
+BACKUP_DIR="/storage/emulated/0/Manus_Backups"
+AUTO_BACKUP_DIR="$BACKUP_DIR/auto_pre_fix"
+MANUAL_BACKUP_DIR="$BACKUP_DIR/manual"
+RESTORE_DIR="$HOME/restored_projects"
+mkdir -p "$PROJECTS_DIR" "$AUTO_BACKUP_DIR" "$MANUAL_BACKUP_DIR" "$RESTORE_DIR"
+_log_error() { echo "❌ ERROR: $1" >&2; }
+_log_success() { echo "✅ SUCCESS: $1"; }
+_log_info() { echo "ℹ️ INFO: $1"; }
+main() {
+    ACTION="$1"; shift
+    case "$ACTION" in
+        import)
+            local source_path="$1"; [ -z "$source_path" ] && { _log_error "Source path required."; exit 1; }
+            local project_name=$(basename "$source_path"); local dest_path="$PROJECTS_DIR/$project_name"
+            _log_info "Importing '$project_name'..."; rsync -av --progress "$source_path/" "$dest_path/" --exclude 'build' --exclude '.git' --exclude 'node_modules'
+            echo -e "/build\n/node_modules\n.idea/" > "$dest_path/.gitignore"
+            _log_success "Project '$project_name' imported."; echo "$project_name"
+            ;;
+        init)
+            local project_name="$1"; local repo_url="$2"; local project_path="$PROJECTS_DIR/$project_name"
+            cd "$project_path" || exit; _log_info "Initializing Git..."; git init; git add .; git commit -m "Initial commit"
+            git remote add origin "$repo_url"; _log_success "Git repo initialized."
+            ;;
+        publish)
+            local project_name="$1"; local msg="${2:-"Auto-commit"}"; local project_path="$PROJECTS_DIR/$project_name"
+            cd "$project_path" || exit; _log_info "Publishing..."; git add .; git commit -m "$msg"
+            git push origin main; _log_success "Published."
+            ;;
+        backup)
+            local project_name="$1"; local project_path="$PROJECTS_DIR/$project_name"
+            local timestamp=$(date +%Y-%m-%d_%H-%M-%S); local backup_name="manual_${project_name}_${timestamp}.zip"
+            local zip_file="$MANUAL_BACKUP_DIR/$backup_name"
+            _log_info "Creating backup..."; ( cd "$project_path" && zip -r "$zip_file" . -x 'build/*' '.git/*' 'node_modules/*' )
+            _log_success "Backup created: $zip_file"; echo "$zip_file"
+            ;;
+        *) echo "Usage: manus-core <import|init|publish|backup> [options]";;
+    esac
+}; main "$@"
