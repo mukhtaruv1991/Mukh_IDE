@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Mukh IDE - The Royal Installer (v5.0)
+# Mukh IDE - The Royal Installer (v5.1 - Command Fix)
 
 echo "🚀 Welcome to the Mukh IDE Royal Installer!"
 echo "--- Preparing your environment..."
@@ -18,7 +18,9 @@ if [ $? -ne 0 ]; then exit 1; fi
 echo "--- Unpacking and setting up tools..."
 tar -xzvf mukh-ide-tools.tar.gz -C ~
 rm mukh-ide-tools.tar.gz
-# This is the crucial new step:
+
+# THIS IS THE CRUCIAL FIX: Create the symbolic links
+echo "--- Creating global commands..."
 ln -sf ~/mukh-ide-tools/mukh-bot ~/../usr/bin/mukh-bot
 ln -sf ~/mukh-ide-tools/manus-core ~/../usr/bin/manus-core
 
