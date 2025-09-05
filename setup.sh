@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Mukh IDE - The Simple & Direct Installer (v9.0)
+# Mukh IDE - The Simple & Direct Installer (v9.1 - Clear Instructions)
 
 echo "🚀 Welcome to the Mukh IDE Simple Installer!"
 echo "--- Preparing your environment..."
@@ -10,21 +10,17 @@ for pkg_name in "${packages_to_install[@]}"; do
 done
 
 echo "--- Downloading the tools package..."
-# Note the new package name
 curl -L https://github.com/mukhtaruv1991/Mukh-IDE-Release/raw/main/Mukh-IDE.tar.gz -o Mukh-IDE.tar.gz
 if [ $? -ne 0 ]; then exit 1; fi
 
 echo "--- Unpacking tools into ~/Mukh-IDE..."
-# Unpack and create the main folder
 tar -xzvf Mukh-IDE.tar.gz -C ~
 rm Mukh-IDE.tar.gz
 
-# Go directly into the new folder
-cd ~/Mukh-IDE
-
 echo ""
 echo "--- ⚙️ Configuring your personal settings..."
-bash configure.sh
+# We run configure.sh using its full path
+bash ~/Mukh-IDE/configure.sh
 
 echo ""
 echo "--- 🐍 Installing Python libraries..."
@@ -32,9 +28,13 @@ if ! python -c "import telegram" &> /dev/null; then pip install python-telegram-
 
 echo ""
 echo "🎉🎉🎉 SETUP COMPLETE! 🎉🎉🎉"
-echo "You are now inside the project folder: ~/Mukh-IDE"
+echo "The tools have been installed in the '~/Mukh-IDE' folder."
 echo ""
-echo "To start your bot, just run this command:"
+echo "To start your bot, run these two commands:"
 echo "------------------------------------------"
+echo "1. Go into the project folder:"
+echo "   cd ~/Mukh-IDE"
+echo ""
+echo "2. Run the bot:"
 echo "   python Mukh_bot.py"
 echo "------------------------------------------"
