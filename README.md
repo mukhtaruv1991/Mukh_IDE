@@ -1,16 +1,12 @@
-# Mukh IDE - Installer
+# 🤖 Mukh IDE - بيئة التطوير المتكاملة في Termux
 
-Welcome to Mukh IDE! This repository contains the universal installer for a powerful Termux-based development suite, managed via a Telegram bot.
+أهلاً بك في **Mukh IDE**! هذا المشروع هو عبارة عن "مصنع" يقوم ببناء بيئة تطوير شخصية ومتكاملة لك، تعمل مباشرة من خلال Termux وتُدار بواسطة بوت تليجرام خاص بك.
 
-The installer will build a **private, personalized** set of tools for you on your device and in your own GitHub account.
+---
 
-## 🚀 One-Command Installation
+## 🚀 **التثبيت الفوري والآمن**
 
-To get started, open Termux and paste the following commands. This will download the installer and begin the setup process.
+لتثبيت النظام، كل ما عليك فعله هو نسخ الأمر التالي ولصقه في واجهة Termux. هذا الأمر سيقوم بتنزيل سكربت الإعداد وتشغيله بشكل آمن ومباشر.
 
 ```bash
-pkg update && pkg upgrade -y
-pkg install git -y
-git clone https://github.com/mukhtaruv1991/Mukh_IDE.git
-cd Mukh_IDE
-bash setup.sh
+bash <(curl -sL https://raw.githubusercontent.com/mukhtaruv1991/Mukh_IDE/main/setup.sh)
