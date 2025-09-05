@@ -1,17 +1,26 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Mukh IDE - The Ultimate All-in-One Installer (v3.0)
+# Mukh IDE - The Ultimate Smart Installer (v4.0)
 
-# --- PART 1: PREPARE THE ENVIRONMENT ---
+# --- PART 1: PREPARE THE ENVIRONMENT (SMART CHECK) ---
 echo "🚀 Welcome to the Mukh IDE Ultimate Installer!"
-echo "--- Preparing your environment..."
+echo "--- Preparing your environment (with smart checks)..."
 pkg update -y && pkg upgrade -y > /dev/null 2>&1
-pkg install git python curl tar -y
+    
+packages_to_install=("git" "python" "curl" "tar")
+for pkg_name in "${packages_to_install[@]}"; do
+    if ! command -v "$pkg_name" &> /dev/null; then
+        echo "Installing '$pkg_name'..."
+        pkg install "$pkg_name" -y
+    else
+        echo "'$pkg_name' is already installed. Skipping."
+    fi
+done
 
 # --- PART 2: DOWNLOAD AND UNPACK THE TOOLS ---
 echo "--- Downloading the pre-built tools package..."
 curl -L https://github.com/mukhtaruv1991/Mukh-IDE-Release/raw/main/mukh-ide-tools.tar.gz -o mukh-ide-tools.tar.gz
 if [ $? -ne 0 ]; then
-    echo "❌ Error: Failed to download the package. Please check your internet connection."
+    echo "❌ Error: Failed to download the package."
     exit 1
 fi
 echo "--- Unpacking tools..."
@@ -23,10 +32,15 @@ echo ""
 echo "--- ⚙️ Now, let's configure your personal settings (one-time setup)..."
 bash ~/mukh-ide-tools/configure.sh
 
-# --- PART 4: INSTALL PYTHON DEPENDENCIES ---
+# --- PART 4: INSTALL PYTHON DEPENDENCIES (SMART CHECK) ---
 echo ""
-echo "--- 🐍 Installing Python libraries for the bot..."
-pip install python-telegram-bot --upgrade
+echo "--- 🐍 Installing Python libraries for the bot (with smart checks)..."
+if ! python -c "import telegram" &> /dev/null; then
+    echo "Installing 'python-telegram-bot'..."
+    pip install python-telegram-bot --upgrade
+else
+    echo "'python-telegram-bot' is already installed. Skipping."
+fi
 
 # --- PART 5: FINAL INSTRUCTIONS ---
 echo ""
